@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Entrepreneur Dashboard</title><link rel='stylesheet' href='styles.css'></head><body>
+<header class="site-header"><div><h1 style="margin:0">ZackFinance</h1></div><nav class="nav"><a href="index.html">Home</a><a href="projects_list.html">Projects</a><a href="chat_advanced.html">Messages</a></nav></header>
+<main class="container"><div class="card"><h2>Your Projects</h2><div id="projects"></div><a class="btn" href="project_upload.html">Upload New Project</a></div>
+<div class="card"><h2>Profile</h2><div id="profile"></div></div></main>
+<script src="firebase_core.js"></script>
+<script>
+auth.onAuthStateChanged(async user=>{
+  if(!user) return window.location='login.html';
+  const profile = await currentUserProfile();
+  document.getElementById('profile').innerHTML = `<div><strong>${profile.name}</strong><p class="small">${profile.email}</p></div>`;
+  const snap = await db.collection('projects').where('ownerUid','==',user.uid).orderBy('created','desc').get();
+  let out=''; snap.forEach(d=>{ const p=d.data(); out+=`<div class="card"><h4>${p.title}</h4><p class="small">${p.budget || ''}</p><p>${p.description}</p></div>`; });
+  document.getElementById('projects').innerHTML = out || '<p class="small">Hakuna mradi uliopakiwa.</p>';
+});
+</script></body></html>

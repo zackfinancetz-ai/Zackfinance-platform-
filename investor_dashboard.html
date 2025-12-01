@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Investor Dashboard</title><link rel='stylesheet' href='styles.css'></head><body>
+<header class="site-header"><div><h1 style="margin:0">ZackFinance</h1></div><nav class="nav"><a href="index.html">Home</a><a href="projects_list.html">Projects</a><a href="chat_advanced.html">Messages</a></nav></header>
+<main class="container"><div class="card"><h2>Recommended Projects</h2><div id="projects"></div></div>
+<div class="card"><h2>Your Profile</h2><div id="profile"></div></div></main>
+<script src="firebase_core.js"></script>
+<script>
+auth.onAuthStateChanged(async user=>{
+  if(!user) return window.location='login.html';
+  const profile = await currentUserProfile();
+  document.getElementById('profile').innerHTML = `<div><strong>${profile.name}</strong><p class="small">${profile.email}</p></div>`;
+  const snap = await db.collection('projects').orderBy('created','desc').limit(10).get();
+  let out=''; snap.forEach(d=>{ const p=d.data(); out+=`<div class="card"><h4>${p.title}</h4><p class="small">Owner: ${p.ownerName}</p><p>${p.description}</p><p><button class="btn" onclick="startChat('${d.id}','${p.ownerUid}','${p.ownerName}')">Message Owner</button></p></div>`; });
+  document.getElementById('projects').innerHTML = out;
+});
+function startChat(projectId, ownerUid, ownerName){
+  const recipient = ownerUid;
+  // store last chat target then open messages page with recipient param
+  localStorage.setItem('chat_recipient', recipient);
+  window.location='chat_advanced.html';
+}
+</script></body></html>

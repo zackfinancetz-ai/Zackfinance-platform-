@@ -1,0 +1,113 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Admin Dashboard</title><link rel='stylesheet' href='styles.css'></head><body>
+<header class="site-header"><div><h1 style="margin:0">Admin - ZackFinance</h1></div><nav class="nav"><a href="index.html">Home</a></nav></header>
+<main class="container">
+  <div class="card"><h2>Pending Projects (Approve / Reject)</h2><div id="pending"></div></div>
+  <div class="card"><h2>All Projects</h2><div id="projects"></div></div>
+  <div class="card"><h2>All Users</h2><div id="users"></div></div>
+</main>
+<script src="firebase_core.js"></script>
+<script>
+auth.onAuthStateChanged(async user=>{
+  if(!user) return window.location='login.html';
+  const adm = await db.collection('admins').doc(user.uid).get();
+  if(!adm.exists){ alert('Not an admin'); auth.signOut(); return; }
+  loadPending();
+  loadAllProjects();
+  loadUsers();
+});
+
+async function loadPending(){
+  const snap = await db.collection('projects').where('status','==','pending').orderBy('created','desc').get();
+  let out='';
+  snap.forEach(d=>{
+    const p = d.data();
+    out += `<div class="card"><h4>${p.title}</h4><p class="small">By: ${p.ownerName} (${p.ownerEmail})</p><p>${p.description}</p>
+      <div style="margin-top:8px">
+        <button class="btn" onclick="approve('${d.id}')">Approve</button>
+        <button style="background:#e53e3e" class="btn" onclick="reject('${d.id}')">Reject</button>
+      </div></div>`;
+  });
+  document.getElementById('pending').innerHTML = out || '<p class="small">No pending projects.</p>';
+}
+
+async function approve(id){
+  if(!confirm('Confirm approve project?')) return;
+  await db.collection('projects').doc(id).update({status:'approved',approvedAt:Date.now()});
+  alert('Project approved.');
+  loadPending(); loadAllProjects();
+}
+
+async function reject(id){
+  const reason = prompt('Reason for rejection (optional):') || '';
+  await db.collection('projects').doc(id).update({status:'rejected',rejectedAt:Date.now(),rejectReason:reason});
+  alert('Project rejected.');
+  loadPending(); loadAllProjects();
+}
+
+async function loadAllProjects(){
+  const snap = await db.collection('projects').orderBy('created','desc').get();
+  let out='';
+  snap.forEach(d=>{
+    const p=d.data();
+    out += `<div class="card"><h4>${p.title} <span class="small">[${p.status||'n/a'}]</span></h4><p class="small">By: ${p.ownerName}</p><p>${p.description}</p>
+      <div style="margin-top:8px"><button style="background:#e53e3e" class="btn" onclick="deleteProject('${d.id}','${p.ownerUid||''}')">Delete</button></div></div>`;
+  });
+  document.getElementById('projects').innerHTML = out;
+}
+
+async function loadUsers(){
+  const snap = await db.collection('users').orderBy('created','desc').get();
+  let out='';
+  snap.forEach(d=>{
+    const u = d.data();
+    out += `<div class="card"><div class="flex"><div class="avatar">${(u.name||'U').substring(0,2)}</div><div><strong>${u.name}</strong><div class="small">${u.email||'—'}</div></div></div>
+      <p class="small">Type: ${u.type||'—'}</p>
+      <div style="margin-top:8px"><button style="background:#e53e3e" class="btn" onclick="deleteUser('${d.id}','${u.email||''}')">Delete User</button></div></div>`;
+  });
+  document.getElementById('users').innerHTML = out;
+}
+
+async function deleteProject(id, ownerUid){
+  if(!confirm('Delete this project permanently?')) return;
+  // delete storage image if exists
+  const doc = await db.collection('projects').doc(id).get();
+  if(doc.exists){
+    const data = doc.data();
+    if(data.imageUrl){
+      try{
+        const ref = storage.refFromURL(data.imageUrl);
+        await ref.delete();
+      }catch(e){ console.warn('Image delete failed', e.message); }
+    }
+  }
+  await db.collection('projects').doc(id).delete();
+  alert('Project deleted.');
+  loadAllProjects(); loadPending();
+}
+
+async function deleteUser(uid,email){
+  if(!confirm('This will permanently delete the user and their projects. Continue?')) return;
+  // delete user auth (requires Firebase Admin SDK - cannot be done client-side)
+  // Instead: mark user as 'deleted' and remove public data; inform admin to delete via Firebase Console
+  try{
+    // remove user's projects & associated images
+    const pSnap = await db.collection('projects').where('ownerUid','==',uid).get();
+    for(const doc of pSnap.docs){
+      const data = doc.data();
+      if(data.imageUrl){
+        try{ const ref = storage.refFromURL(data.imageUrl); await ref.delete(); } catch(e){ console.warn(e.message); }
+      }
+      await db.collection('projects').doc(doc.id).delete();
+    }
+    // remove user document
+    await db.collection('users').doc(uid).delete();
+    // optionally flag for admin to remove auth user via Firebase Console
+    await db.collection('admin_actions').add({action:'delete_user',uid:uid,email:email,by:auth.currentUser.uid,when:Date.now()});
+    alert('User data removed from Firestore. NOTE: To fully remove the Auth user, delete them in Firebase Console (Users).');
+    loadUsers(); loadAllProjects();
+  }catch(e){
+    alert('Delete failed: '+e.message);
+  }
+}
+</script>
+</body></html>

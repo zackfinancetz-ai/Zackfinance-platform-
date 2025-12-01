@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Projects</title><link rel='stylesheet' href='styles.css'></head><body>
+<header class="site-header"><div><h1 style="margin:0">ZackFinance</h1></div></header>
+<main class="container"><h2>Approved Projects</h2><div id="list" class="grid"></div></main>
+<script src="firebase_core.js"></script>
+<script>
+db.collection('projects').where('status','==','approved').orderBy('created','desc').get().then(snap=>{
+  let out='';
+  snap.forEach(d=>{ const p=d.data(); out+=`<div class="card"><h3>${p.title}</h3>${p.imageUrl?'<img src="'+p.imageUrl+'" style="width:100%;border-radius:8px;margin-top:8px"/>':''}<p class="small">Owner: ${p.ownerName}</p><p>${p.description}</p></div>` });
+  document.getElementById('list').innerHTML = out || '<p class="small">No approved projects yet.</p>';
+});
+</script></body></html>

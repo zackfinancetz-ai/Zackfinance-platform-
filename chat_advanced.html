@@ -1,0 +1,65 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Messages</title><link rel='stylesheet' href='styles.css'></head><body>
+<header class="site-header"><div><h1 style="margin:0">ZackFinance</h1></div><nav class="nav"><a href="index.html">Home</a></nav></header>
+<main class="container"><div class="grid"><div class="card" style="max-width:340px"><h3>Conversations</h3><div id="convos"></div></div><div class="card" style="flex:1"><h3 id="chatWith">Select a conversation</h3><div id="chatWindow" class="chat-window"></div><div style="display:flex;gap:8px;margin-top:8px"><input id="msg" class="input" placeholder="Write a message..."><button class="btn" id="sendBtn">Send</button></div></div></div></main>
+<script src="firebase_core.js"></script>
+<script>
+let currentUser, currentRecipient=null;
+auth.onAuthStateChanged(async u=>{
+  if(!u) return window.location='login.html';
+  currentUser = u;
+  loadConversations();
+  // if recipient preselected (from investor dashboard), use it
+  const pre = localStorage.getItem('chat_recipient');
+  if(pre){ selectConversation(pre); localStorage.removeItem('chat_recipient'); }
+});
+async function loadConversations(){
+  // find users who chatted with me (messages where sender==me or recipient==me)
+  const q = await db.collection('dm_messages')
+    .where('participants', 'array-contains', currentUser.uid)
+    .orderBy('time','desc').get();
+  const convos = {};
+  q.forEach(d=>{
+    const m = d.data();
+    const other = m.sender === currentUser.uid ? m.recipient : m.sender;
+    convos[other] = {last:m.text, time:m.time};
+  });
+  let out='';
+  for(const uid in convos){
+    out += `<div class="flex" style="cursor:pointer;padding:8px;border-bottom:1px solid #f1f4fb" onclick="selectConversation('${uid}')"><div class="avatar">${uid.substring(0,2)}</div><div><strong>${uid}</strong><div class="small">${convos[uid].last}</div></div></div>`;
+  }
+  document.getElementById('convos').innerHTML = out || '<p class="small">No conversations yet.</p>';
+}
+async function selectConversation(uid){
+  currentRecipient = uid;
+  document.getElementById('chatWith').textContent = 'Chat with ' + uid;
+  // listen for messages between currentUser and recipient
+  db.collection('dm_messages')
+    .where('participants','array-contains', currentUser.uid)
+    .orderBy('time')
+    .onSnapshot(snap=>{
+      let out='';
+      snap.forEach(d=>{
+        const m = d.data();
+        if((m.sender === currentUser.uid && m.recipient===currentRecipient) || (m.sender===currentRecipient && m.recipient===currentUser.uid)){
+          const cls = m.sender===currentUser.uid ? 'message me' : 'message them';
+          out += `<div class="${cls}">${m.text}</div>`;
+        }
+      });
+      document.getElementById('chatWindow').innerHTML = out;
+      document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
+  });
+}
+document.getElementById('sendBtn').addEventListener('click', async ()=>{
+  const text = document.getElementById('msg').value.trim();
+  if(!text || !currentRecipient) return alert('Select conversation first');
+  await db.collection('dm_messages').add({
+    sender: currentUser.uid,
+    recipient: currentRecipient,
+    participants: [currentUser.uid, currentRecipient],
+    text: text,
+    time: Date.now()
+  });
+  document.getElementById('msg').value='';
+  loadConversations();
+});
+</script></body></html>
