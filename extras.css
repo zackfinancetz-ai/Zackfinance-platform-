@@ -1,0 +1,36 @@
+
+/* DASHBOARD */
+.stats-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    padding:20px;
+}
+.stat-card {
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+.stat-card:hover { transform:scale(1.05); }
+
+.data-table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+.data-table th, .data-table td {
+    padding:14px;
+    border-bottom:1px solid #e0e0e0;
+}
+.data-table th {
+    background:#0047bb;
+    color:white;
+    text-align:left;
+}
