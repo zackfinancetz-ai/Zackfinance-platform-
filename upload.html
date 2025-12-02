@@ -1,17 +1,16 @@
 
 <!DOCTYPE html><html><head><meta charset='UTF-8'><title>Upload Project</title>
-<link rel='stylesheet' href='styles.css'></head><body>
-<nav><div class='logo'>ZackFinance</div>
-<div><a href='index.html'>Home</a><a href='about.html'>About</a>
-<a href='upload.html'>Upload Project</a><a href='contact.html'>Contact</a></div></nav>
-
-<div class='container'>
-<h2>Upload Your Project</h2>
-<div class='card'>
-<input type='text' placeholder='Project Name'>
-<textarea rows='5' placeholder='Project Description'></textarea>
-<input type='file'>
-<button>Submit Project</button>
-</div></div>
-
-<footer class='footer'>© 2025 ZackFinance</footer></body></html>
+<style>body{font-family:Arial;background:#eef6ff;padding:20px;}header{background:#0053a6;color:#fff;padding:20px;border-radius:12px;} nav a{margin:0 15px;color:#fff;text-decoration:none;font-weight:bold;}form{background:#fff;padding:20px;border-radius:12px;max-width:400px;}input,textarea{width:100%;margin:10px 0;padding:10px;border-radius:8px;border:1px solid #ccc;}</style>
+</head><body>
+<header><h1>Upload Project</h1>
+<nav><a href="index.html">Home</a><a href="about.html">About</a><a href="upload.html">Upload</a><a href="contact.html">Contact</a></nav>
+</header>
+<section>
+<form>
+<label>Project Name</label><input type="text" required>
+<label>Description</label><textarea required></textarea>
+<label>Upload Image</label><input type="file" accept="image/*">
+<button type="submit" style="background:#0053a6;color:#fff;padding:10px 20px;border-radius:8px;border:none;">Submit</button>
+</form>
+</section>
+</body></html>
