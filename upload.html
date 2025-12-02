@@ -1,54 +1,39 @@
-<!doctype html>
-<html lang="en">
+
+<!DOCTYPE html>
+<html lang='en'>
 <head>
-  <meta charset="utf-8" />
-  <title>Upload Project</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset='UTF-8'>
+<title>Upload Project - ZackFinance</title>
+<link rel='stylesheet' href='styles.css'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+
 <body>
-<header class="site-header"><div class="container"><h1 class="brand">ZackFinance</h1></div></header>
+<nav class='navbar fade-down'>
+    <div class='logo'>ZackFinance</div>
+    <div class='nav-links'>
+        <a href='index.html'>Home</a>
+        <a href='upload.html'>Upload Project</a>
+        <a href='about.html'>About</a>
+    </div>
+</nav>
 
-<main class="container">
-  <section class="card">
-    <h3>Upload Project</h3>
-    <label>Project Title</label>
-    <input id="title" type="text" />
+<section class='container'>
+    <h2 class='title'>Upload Your Project</h2>
+    <form class='form-card pop-in'>
+        <label>Project Name</label>
+        <input type='text' placeholder='Enter project name'>
 
-    <label>Description</label>
-    <textarea id="desc" rows="4"></textarea>
+        <label>Description</label>
+        <textarea placeholder='Describe your project...'></textarea>
 
-    <label>Project Image (optional)</label>
-    <input id="image" type="file" accept="image/*" />
+        <label>Upload Image</label>
+        <input type='file'>
 
-    <button id="saveBtn">Save</button>
-    <div id="status" class="small"></div>
-  </section>
-</main>
+        <button class='btn-primary' type='submit'><i class='fa-solid fa-upload'></i> Submit Project</button>
+    </form>
+</section>
 
-<script>
-document.getElementById('saveBtn').onclick = async () => {
-  const title = title.value.trim();
-  const desc = desc.value.trim();
-  let imageData = "";
-
-  if(!title || !desc) { alert("Title & description required"); return; }
-
-  if(image.files[0]) {
-    imageData = await new Promise(res => {
-      const r = new FileReader();
-      r.onload = e => res(e.target.result);
-      r.readAsDataURL(image.files[0]);
-    });
-  }
-
-  const raw = localStorage.getItem("zf_projects") || "[]";
-  const arr = JSON.parse(raw);
-  arr.unshift({title, desc, image: imageData});
-  localStorage.setItem("zf_projects", JSON.stringify(arr));
-  status.textContent = "Saved!";
-};
-</script>
-
+<footer class='footer fade-in'>© 2025 ZackFinance Platform – All Rights Reserved.</footer>
 </body>
 </html>
