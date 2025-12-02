@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin — ZackFinance</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="container"><h1 class="brand">ZackFinance Admin</h1></div></header>
+  <main class="container">
+    <section class="card" id="login-card">
+      <h3>Admin Login</h3>
+      <p class="small">Enter admin pass (demo). For production, use server-side auth.</p>
+      <div><label>Password</label><input id="adminPass" type="password"/></div>
+      <div style="margin-top:10px"><button id="adminLogin">Enter Admin</button></div>
+      <div id="adminMsg" class="small"></div>
+    </section>
+
+    <section class="card" id="admin-panel" style="display:none">
+      <h3>Admin Dashboard (demo)</h3>
+      <div>
+        <button id="showProjects">Show All Projects</button>
+        <button id="showUsers">Show Users</button>
+        <button id="clearData">Clear Demo Data</button>
+      </div>
+      <div id="adminArea" style="margin-top:12px"></div>
+    </section>
+  </main>
+
+<script>
+const ADMIN_PASS = 'zackadmin2025'; // demo password (change after download)
+document.getElementById('adminLogin').addEventListener('click', ()=>{
+  const p = document.getElementById('adminPass').value;
+  if(p===ADMIN_PASS){
+    document.getElementById('login-card').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+  } else {
+    document.getElementById('adminMsg').textContent='Wrong password (demo).';
+  }
+});
+
+document.getElementById('showProjects').addEventListener('click', ()=>{
+  const raw = localStorage.getItem('zf_projects') || '[]';
+  const projects = JSON.parse(raw);
+  const area = document.getElementById('adminArea');
+  if(!projects.length){ area.innerHTML='<em>No projects</em>'; return; }
+  area.innerHTML = projects.map((p,i)=>\`
+    <div style="border-bottom:1px solid #eee;padding:10px 0">
+      <strong>\${p.title}</strong><br/>
+      <small>By: \${p.author||'Anonymous'} - \${new Date(p.created).toLocaleString()}</small>
+      <p>\${p.desc}</p>
+      \${p.image?'<img src="'+p.image+'" style="max-width:200px;border-radius:6px"/>':''}
+      <div style="margin-top:6px"><button onclick="deleteProject(\${i})">Delete</button></div>
+    </div>
+  \`).join('');
+});
+
+function deleteProject(idx){
+  const raw = localStorage.getItem('zf_projects') || '[]';
+  const projects = JSON.parse(raw);
+  projects.splice(idx,1);
+  localStorage.setItem('zf_projects', JSON.stringify(projects));
+  document.getElementById('showProjects').click();
+}
+
+document.getElementById('showUsers').addEventListener('click', ()=>{
+  const raw = localStorage.getItem('zf_users') || '[]';
+  const users = JSON.parse(raw);
+  const area = document.getElementById('adminArea');
+  if(!users.length){ area.innerHTML='<em>No users</em>'; return; }
+  area.innerHTML = users.map(u=>\`<div style="border-bottom:1px solid #eee;padding:8px 0"><strong>\${u.name}</strong> — \${u.email} — \${u.mobile||''}</div>\`).join('');
+});
+
+document.getElementById('clearData').addEventListener('click', ()=>{
+  if(!confirm('Clear demo data in this browser?')) return;
+  localStorage.removeItem('zf_projects');
+  localStorage.removeItem('zf_users');
+  localStorage.removeItem('zf_session');
+  document.getElementById('adminArea').innerHTML='<em>Cleared.</em>';
+});
+</script>
+</body>
+</html>

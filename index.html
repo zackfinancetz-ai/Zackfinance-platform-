@@ -1,108 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ZackFinance Marketplace</title>
-<style>
-  body { font-family: Arial; margin:0; background:#f4f7ff; }
-  header { background:#0b66ff; color:white; padding:20px; text-align:center; }
-  .section { padding:20px; max-width:900px; margin:auto; }
-  .project { background:white; padding:15px; border-radius:8px; margin-bottom:10px; }
-  input, textarea { width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:6px; }
-  button { background:#0b66ff; color:white; padding:10px 16px; border:none; border-radius:6px; cursor:pointer; }
-  #adminPanel { display:none; background:white; padding:15px; border-radius:8px; }
-</style>
+  <meta charset="utf-8" />
+  <title>ZackFinance — Marketplace</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header>
-  <h2>ZackFinance Marketplace</h2>
-</header>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand">ZackFinance</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload Project</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+        <a href="about.html">About</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
 
-<div class="section">
-  <h3>About Us</h3>
-  <p>
-    ZackFinance is a simple marketplace created to help entrepreneurs share their projects
-    and connect with potential supporters. The platform is designed to be light,
-    fast, and easy to use.
-  </p>
-  <p>
-    Only the admin can publish projects, ensuring all posted items are verified and safe.
-    Visitors can view projects easily without any sign-up.
-  </p>
-  <p>
-    We focus on clarity, transparency, and easy communication. If you have a project
-    or want to learn more, feel free to reach out using the contact below.
-  </p>
-</div>
+  <main class="container">
+    <section class="hero">
+      <h2>Connecting entrepreneurs with investors</h2>
+      <p>Upload your project, tell your story, and get discovered by investors.</p>
+    </section>
 
-<div class="section">
-  <h3>Projects</h3>
-  <div id="projects"></div>
-  <p id="none" style="color:#777;">No projects yet.</p>
-</div>
+    <section id="project-form" class="card">
+      <h3>Submit Your Project (Google Form)</h3>
+      <p>Use the form below to submit project details. Responses are collected in Google Forms.</p>
+      <iframe 
+        src="https://docs.google.com/forms/d/e/1FAIpQLSePYzqFlPqNGAsvNP5A92aTdKXoRRGGQHgL8DqpXMc_H_mtew/viewform?embedded=true"
+        width="100%" 
+        height="900" 
+        frameborder="0"
+        style="border: none; border-radius: 8px;">
+        Loading…
+      </iframe>
+    </section>
 
-<div class="section">
-  <h3>Contact</h3>
-  <p>Phone: <strong>0713-701810</strong></p>
-</div>
+    <section class="card">
+      <h3>Latest Projects (local demo)</h3>
+      <div id="projects-list">No projects yet — upload a project to see it here (demo).</div>
+    </section>
+  </main>
 
-<div class="section">
-  <h3>Admin Login</h3>
-  <input id="pass" type="password" placeholder="Enter admin password" />
-  <button onclick="login()">Login</button>
-
-  <div id="adminPanel">
-    <h3>Post New Project</h3>
-    <input id="title" placeholder="Project title" />
-    <textarea id="desc" placeholder="Short description"></textarea>
-    <button onclick="postProject()">Post Project</button>
-
-    <h4 style="margin-top:20px;">Google Form</h4>
-    <p>Form imeunganishwa moja kwa moja hapa chini.</p>
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSePYzqFlPqNGAsvNP5A92aTdKXoRRGGQHgL8DqpXMc_H_mtew/viewform?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-  </div>
-</div>
+  <footer class="site-footer">
+    <div class="container">
+      <small>© ZackFinance — connecting investors & entrepreneurs</small>
+      <div>Contact: 0713-XXXXXX</div>
+    </div>
+  </footer>
 
 <script>
-  const adminPassword = "admin123";
-
-  function login(){
-    if(document.getElementById("pass").value === adminPassword){
-      document.getElementById("adminPanel").style.display = "block";
-    } else alert("Wrong password");
+  // Demo: show locally stored projects (from Upload page)
+  function renderProjects() {
+    const list = document.getElementById('projects-list');
+    const raw = localStorage.getItem('zf_projects') || '[]';
+    const projects = JSON.parse(raw);
+    if (!projects.length) {
+      list.innerHTML = '<em>No projects uploaded in this demo.</em>';
+      return;
+    }
+    list.innerHTML = projects.map(p => `
+      <div class="project">
+        <h4>${p.title}</h4>
+        <p>${p.desc}</p>
+        ${p.image ? '<img src="'+p.image+'" alt="project image" class="thumb"/>' : ''}
+        <small>By: ${p.author || 'Anonymous'}</small>
+      </div>
+    `).join('');
   }
-
-  function postProject(){
-    const t = document.getElementById("title").value.trim();
-    const d = document.getElementById("desc").value.trim();
-    if(!t || !d){ alert("Add title and description"); return; }
-
-    const list = JSON.parse(localStorage.getItem("z_projects")||"[]");
-    list.push({t, d});
-    localStorage.setItem("z_projects", JSON.stringify(list));
-    load();
-
-    document.getElementById("title").value = "";
-    document.getElementById("desc").value = "";
-  }
-
-  function load(){
-    const box = document.getElementById("projects");
-    const none = document.getElementById("none");
-    const list = JSON.parse(localStorage.getItem("z_projects")||"[]");
-    box.innerHTML = "";
-    if(list.length === 0){ none.style.display = "block"; return; }
-    none.style.display = "none";
-    list.slice().reverse().forEach(p=>{
-      const div = document.createElement("div");
-      div.className = "project";
-      div.innerHTML = `<h4>${p.t}</h4><p>${p.d}</p>`;
-      box.appendChild(div);
-    });
-  }
-
-  load();
+  document.addEventListener('DOMContentLoaded', renderProjects);
 </script>
 
 </body>

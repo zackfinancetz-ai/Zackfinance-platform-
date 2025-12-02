@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Upload Project — ZackFinance</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand">ZackFinance</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload Project</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h3>Upload Project (demo)</h3>
+      <p class="small">This demo stores project data in your browser (localStorage). For production, connect to Firebase or a backend.</p>
+
+      <div>
+        <label>Project Title</label>
+        <input id="title" type="text" placeholder="Project title"/>
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea id="desc" rows="4" placeholder="Short description"></textarea>
+      </div>
+      <div>
+        <label>Author / Name</label>
+        <input id="author" type="text" placeholder="Your name (optional)"/>
+      </div>
+      <div>
+        <label>Project Image (optional)</label>
+        <input id="image" type="file" accept="image/*"/>
+      </div>
+      <div style="margin-top:10px">
+        <button id="saveBtn">Save Project (demo)</button>
+      </div>
+
+      <div id="status" class="small"></div>
+    </section>
+  </main>
+
+<script>
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  const title = document.getElementById('title').value.trim();
+  const desc = document.getElementById('desc').value.trim();
+  const author = document.getElementById('author').value.trim();
+  if(!title || !desc){ alert('Please provide title and description'); return; }
+  const fileInput = document.getElementById('image');
+  let imageData = '';
+  if(fileInput.files && fileInput.files[0]){
+    const f = fileInput.files[0];
+    imageData = await new Promise(res=>{
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(f);
+    });
+  }
+  const raw = localStorage.getItem('zf_projects') || '[]';
+  const projects = JSON.parse(raw);
+  projects.unshift({title,desc,author,image:imageData,created:Date.now()});
+  localStorage.setItem('zf_projects', JSON.stringify(projects));
+  document.getElementById('status').textContent = 'Project saved locally — visit Home to view (demo).';
+  document.getElementById('title').value='';document.getElementById('desc').value='';document.getElementById('author').value='';fileInput.value='';
+});
+</script>
+</body>
+</html>

@@ -1,23 +1,41 @@
-<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Login</title><link rel='stylesheet' href='styles.css'></head><body>
-<header class="site-header"><div><h1 style="margin:0">ZackFinance</h1></div><nav class="nav"><a href="index.html">Home</a></nav></header>
-<main class="container"><div class="card" style="max-width:520px;margin:18px auto"><h2>Login</h2><div><label>Email</label><input id="email" class="input" type="email"><label>Password</label><input id="password" class="input" type="password"><button class="btn" id="loginBtn">Login</button><p class="small">Hujaji? <a href="register_choice.html">Jisajili</a></p><div id="status" class="small"></div></div></div></main>
-<script src="firebase_core.js"></script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Login — ZackFinance</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="container"><h1 class="brand">ZackFinance</h1></div></header>
+  <main class="container">
+    <section class="card">
+      <h3>Login (demo)</h3>
+      <div>
+        <label>Email</label>
+        <input id="email" type="email"/>
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="password" type="password"/>
+      </div>
+      <div style="margin-top:10px"><button id="loginBtn">Login</button></div>
+      <div id="msg" class="small"></div>
+    </section>
+  </main>
 <script>
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('password').value;
-  try{
-    const res = await auth.signInWithEmailAndPassword(email,password);
-    const uid = res.user.uid;
-    const doc = await db.collection('users').doc(uid).get();
-    if(doc.exists){
-      const data = doc.data();
-      if(data.type === 'entrepreneur') window.location='entrepreneur_dashboard.html';
-      else if(data.type === 'investor') window.location='investor_dashboard.html';
-      else window.location='index.html';
-    } else {
-      document.getElementById('status').textContent='Profile not found.';
-    }
-  }catch(err){ document.getElementById('status').textContent = err.message; }
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const raw = localStorage.getItem('zf_users') || '[]';
+  const users = JSON.parse(raw);
+  const u = users.find(x=>x.email===email && x.password===password);
+  if(!u){ document.getElementById('msg').textContent='Invalid credentials (demo).'; return; }
+  // store session (demo)
+  localStorage.setItem('zf_session', JSON.stringify({email:u.email,name:u.name}));
+  document.getElementById('msg').textContent='Logged in (demo). Redirecting to Home...';
+  setTimeout(()=> location.href='index.html',600);
 });
 </script>
+</body>
+</html>

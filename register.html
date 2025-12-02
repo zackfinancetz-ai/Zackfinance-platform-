@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Register — ZackFinance</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="container"><h1 class="brand">ZackFinance</h1></div></header>
+  <main class="container">
+    <section class="card">
+      <h3>Register (Investor or Entrepreneur)</h3>
+      <div>
+        <label>Full name</label>
+        <input id="name" type="text"/>
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="email" type="email"/>
+      </div>
+      <div>
+        <label>Mobile</label>
+        <input id="mobile" type="text" placeholder="0713..."/>
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="password" type="password"/>
+      </div>
+      <div style="margin-top:10px"><button id="regBtn">Register</button></div>
+      <div id="msg" class="small"></div>
+    </section>
+  </main>
+<script>
+document.getElementById('regBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const mobile = document.getElementById('mobile').value.trim();
+  const password = document.getElementById('password').value;
+  if(!name || !email || !password){ alert('Name, email and password required'); return; }
+  const raw = localStorage.getItem('zf_users') || '[]';
+  const users = JSON.parse(raw);
+  if(users.find(u=>u.email===email)){ document.getElementById('msg').textContent='Email already registered (demo).'; return; }
+  users.push({name,email,mobile,password,role:'user',created:Date.now()});
+  localStorage.setItem('zf_users', JSON.stringify(users));
+  document.getElementById('msg').textContent='Registered (demo). You may now login.';
+  document.getElementById('name').value='';document.getElementById('email').value='';document.getElementById('mobile').value='';document.getElementById('password').value='';
+});
+</script>
+</body>
+</html>
