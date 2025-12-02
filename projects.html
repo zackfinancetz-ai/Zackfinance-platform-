@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><title>ZackFinance</title>
+<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Projects</title>
 <style>
 body{margin:0;font-family:Arial,Helvetica;background:#f5f7fa;color:#333;}
 header{background:#0d47a1;color:#fff;padding:25px;text-align:center;font-size:28px;font-weight:bold;}
@@ -9,7 +9,7 @@ button{background:#0d47a1;color:#fff;border:0;padding:14px 20px;border-radius:10
 nav{text-align:center;margin:20px;}
 nav a{margin:0 15px;color:#0d47a1;font-size:18px;text-decoration:none;font-weight:bold;}
 </style></head><body>
-<header>ZackFinance Platform</header>
+<header>Project List</header>
 <nav>
 <a href='index.html'>Home</a>
 <a href='upload.html'>Upload</a>
@@ -17,9 +17,16 @@ nav a{margin:0 15px;color:#0d47a1;font-size:18px;text-decoration:none;font-weigh
 <a href='about.html'>About</a>
 <a href='contact.html'>Contact</a>
 </nav>
-<div class='container'>
-<div class='card'>
-<h2>Welcome to ZackFinance</h2>
-<p>A modern platform helping entrepreneurs showcase great ideas and connect with potential investors.</p>
-</div>
-</div></body></html>
+<div class='container' id='box'></div>
+<script>
+let data=JSON.parse(localStorage.getItem("projects")||"[]");
+let box=document.getElementById("box");
+if(data.length===0){box.innerHTML="<div class='card'><p>No projects found.</p></div>";}
+data.forEach(p=>{
+ let c=document.createElement("div");
+ c.className="card";
+ c.innerHTML=`<h3>${p.title}</h3><p>${p.desc}</p><small>Saved: ${p.date}</small>`;
+ box.appendChild(c);
+});
+</script>
+</body></html>

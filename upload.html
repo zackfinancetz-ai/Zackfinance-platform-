@@ -1,16 +1,41 @@
-
 <!DOCTYPE html><html><head><meta charset='UTF-8'><title>Upload Project</title>
-<style>body{font-family:Arial;background:#eef6ff;padding:20px;}header{background:#0053a6;color:#fff;padding:20px;border-radius:12px;} nav a{margin:0 15px;color:#fff;text-decoration:none;font-weight:bold;}form{background:#fff;padding:20px;border-radius:12px;max-width:400px;}input,textarea{width:100%;margin:10px 0;padding:10px;border-radius:8px;border:1px solid #ccc;}</style>
-</head><body>
-<header><h1>Upload Project</h1>
-<nav><a href="index.html">Home</a><a href="about.html">About</a><a href="upload.html">Upload</a><a href="contact.html">Contact</a></nav>
-</header>
-<section>
-<form>
-<label>Project Name</label><input type="text" required>
-<label>Description</label><textarea required></textarea>
-<label>Upload Image</label><input type="file" accept="image/*">
-<button type="submit" style="background:#0053a6;color:#fff;padding:10px 20px;border-radius:8px;border:none;">Submit</button>
-</form>
-</section>
+<style>
+body{margin:0;font-family:Arial,Helvetica;background:#f5f7fa;color:#333;}
+header{background:#0d47a1;color:#fff;padding:25px;text-align:center;font-size:28px;font-weight:bold;}
+.container{max-width:1000px;margin:auto;padding:30px;}
+.card{background:#fff;padding:25px;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.08);margin-bottom:20px;}
+input,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;margin-top:8px;margin-bottom:15px;}
+button{background:#0d47a1;color:#fff;border:0;padding:14px 20px;border-radius:10px;font-size:16px;cursor:pointer;}
+nav{text-align:center;margin:20px;}
+nav a{margin:0 15px;color:#0d47a1;font-size:18px;text-decoration:none;font-weight:bold;}
+</style></head><body>
+<header>Upload Project</header>
+<nav>
+<a href='index.html'>Home</a>
+<a href='upload.html'>Upload</a>
+<a href='projects.html'>Projects</a>
+<a href='about.html'>About</a>
+<a href='contact.html'>Contact</a>
+</nav>
+<div class='container'>
+<div class='card'>
+<h2>Add New Project</h2>
+<label>Project Title</label>
+<input id='title'>
+<label>Description</label>
+<textarea id='desc'></textarea>
+<button onclick='saveProject()'>Save Project</button>
+</div></div>
+<script>
+function saveProject(){
+ let t=document.getElementById("title").value;
+ let d=document.getElementById("desc").value;
+ if(!t||!d){alert("Please fill all fields");return;}
+ let arr=JSON.parse(localStorage.getItem("projects")||"[]");
+ arr.push({title:t,desc:d,date:new Date().toLocaleString()});
+ localStorage.setItem("projects",JSON.stringify(arr));
+ alert("Project Saved!");
+ location.href="projects.html";
+}
+</script>
 </body></html>
